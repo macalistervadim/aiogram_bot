@@ -1,8 +1,10 @@
 from aiogram import Router, F
+from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
-from aiogram.filters import CommandStart
+from aiogram.filters import CommandStart, StateFilter
 
 import application.keyboards as kb
+import application.states as st
 
 router = Router()
 
@@ -15,6 +17,26 @@ async def cmd_start(message: Message):
 @router.message(F.text == 'Каталог')
 async def catalog(message: Message):
     await message.answer('Выберите вариант из каталога', reply_markup=await kb.categories())
+
+@router.message(StateFilter(None), F.text == 'Зарегистрироваться')
+async def registration(message: Message, state: FSMContext):
+    await message.answer('Введите Ваше имя:')
+
+    await state.set_state(st.Registration.f_name)
+
+@router.message(st.Registration.f_name)
+async def registration_2(message: Message, state: FSMContext):
+    await state.update_data(first_name=message.text.capitalize())
+    await message.answer('Введите Вашу фамилию: ')
+
+    await state.set_state(st.Registration.l_name)
+
+@router.message(st.Registration.l_name)
+async def registration_2(message: Message, state: FSMContext):
+    await state.update_data(first_name=message.text.capitalize())
+    await message.answer('Введите Ваш номер телефона (для пропуска - 0): ')
+
+    await state.set_state(st.Registration.l_name)
 
 @router.callback_query(F.data.startswith('category_'))
 async def category_selected(callback: CallbackQuery):

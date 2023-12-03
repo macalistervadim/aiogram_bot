@@ -14,9 +14,10 @@ class User(Base):
     __tablename__ = 'users'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    f_name = Column(VARCHAR(255), nullable=False)
-    l_name = Column(VARCHAR(255), nullable=False)
-    phone = Column(VARCHAR(255), nullable=True)
+    f_name: Mapped[str] = mapped_column()
+    l_name: Mapped[str] = mapped_column()
+    phone: Mapped[int] = mapped_column()
+
     tg_id = mapped_column(BigInteger)
 
 class Category(Base):
