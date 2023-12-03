@@ -1,4 +1,4 @@
-from sqlalchemy import BigInteger, ForeignKey
+from sqlalchemy import BigInteger, ForeignKey, Column, VARCHAR
 from sqlalchemy.orm import relationship, Mapped, mapped_column, DeclarativeBase
 from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_engine
 
@@ -14,6 +14,9 @@ class User(Base):
     __tablename__ = 'users'
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    f_name = Column(VARCHAR(255), nullable=False)
+    l_name = Column(VARCHAR(255), nullable=False)
+    phone = Column(VARCHAR(255), nullable=True)
     tg_id = mapped_column(BigInteger)
 
 class Category(Base):
