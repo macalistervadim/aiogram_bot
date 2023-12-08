@@ -13,13 +13,19 @@ async def get_products(category_id):
         result = await session.scalars(select(Product).where(Product.category_id == category_id))
         return result
 
-async def add_user(session: AsyncSession, user_data: dict, tg_id: int):
-    new_user = User(
-        f_name=user_data["first_name"],
-        l_name=user_data["last_name"],
-        phone=user_data["phone"],
-        tg_id=tg_id
-    )
+async def get_user(tg_id):
+    async with async_session() as session:
+        result = await session.scalar(select(User).where(User.tg_id == tg_id))
+        if len(result) > 0:
+            return True
 
-    session.add(new_user)
-    await session.commit()
+async def add_user(session: AsyncSession,tg_id):
+    try:
+        new_user = User(
+            tg_id=tg_id
+        )
+
+        session.add(new_user)
+        await session.commit()
+    except Exception:
+        pass

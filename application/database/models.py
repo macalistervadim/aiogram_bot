@@ -14,11 +14,7 @@ class User(Base):
     __tablename__ = 'users'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    f_name: Mapped[str] = mapped_column()
-    l_name: Mapped[str] = mapped_column()
-    phone: Mapped[int] = mapped_column()
-
-    tg_id = mapped_column(BigInteger)
+    tg_id: Mapped[int] = mapped_column(BigInteger, unique=True)
 
 class Category(Base):
     __tablename__ = 'categories'
