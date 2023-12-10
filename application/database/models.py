@@ -35,6 +35,12 @@ class Product(Base):
 
     category = relationship('Category', back_populates='products')
 
+class Tickets(Base):
+    __tablename__ = 'tickets'
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    number: Mapped[int] = mapped_column()
+
 
 async def async_main():
     async with engine.begin() as conn:

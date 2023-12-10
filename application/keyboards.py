@@ -4,14 +4,14 @@ from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 
 from application.database.requests import get_categories, get_products
 
-registration = ReplyKeyboardMarkup(keyboard=[
-    [KeyboardButton(text='Зарегистрироваться')],
-    [KeyboardButton(text='Удалить профиль')]
-], resize_keyboard=True, input_field_placeholder='Выберите действие')
+cancel = ReplyKeyboardMarkup(keyboard=[
+    [KeyboardButton(text='/cancel')]
+], resize_keyboard=True, input_field_placeholder='Для отмены нажмите /cancel')
 
 main = ReplyKeyboardMarkup(keyboard=[
     [KeyboardButton(text='Каталог')],
-    [KeyboardButton(text='Контакты')]
+    [KeyboardButton(text='Контакты')],
+    [KeyboardButton(text='Тех. поддержка')]
 ], resize_keyboard=True, input_field_placeholder='Выберите пункт ниже')
 
 async def categories():

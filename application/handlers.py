@@ -6,12 +6,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 import application.keyboards as kb
 import application.states as st
-from application.database.requests import add_user
+from application.database.requests import add_user, add_ticket
 from application.database.models import async_session
+from application.middleware import SupportWait
 
 router = Router()
 
-#router.message.outer_middleware(RegistrationMiddleware())
+router.message.middleware(SupportWait())
 
 @router.message(CommandStart())
 async def cmd_start(message: Message):
@@ -35,3 +36,28 @@ async def product_selected(callback: CallbackQuery):
     product_id = callback.data.split('_')[1]
     await callback.message.answer(f'Ваш товар {product_id}')
     await callback.answer('')
+
+@router.message(StateFilter(None), F.text == 'Тех. поддержка')
+async def support(message: Message, state: FSMContext):
+    await message.answer('Добро пожаловать в раздел Технической поддержки.\n'
+                         'Здесь Вы можете найти ответы на интересующие Вас вопросы.\n\n'
+                         'Пожалуйста, для продолжения, напишите свой вопрос (для отмены - /cancel): ',
+                                                                                            reply_markup=kb.cancel)
+
+    await state.set_state(st.Support.question)
+
+@router.message(st.Support.question)
+async def question(message: Message, state: FSMContext):
+    await add_ticket()
+
+    await state.update_data(question=message.text.lower())
+    await message.answer('Спасибо! Мы уже приняли Ваш вопрос и работаем над ним.\n\n'
+                         'В данный момент вы были переброшены в режим "Ожидания" - '
+                         'в данном режиме недоступны никакие команды. После того, как Ваш вопрос будет решён - '
+                         'Вас автоматически уберет из режима ожидания наш бот. Спасибо за понимание.\n\n'
+                         'Если Вы создали ошибочный тикет, пожалуйста, отмените его командой - /cancel',
+                                                                         reply_markup=kb.cancel)
+
+    await state.set_state(st.Support.wait)
+
+
