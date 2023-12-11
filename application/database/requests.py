@@ -32,15 +32,7 @@ async def add_user(session: AsyncSession,tg_id):
 
 async def add_ticket():
     async with async_session() as session:
-        # Получаем максимальный номер билета
-        max_ticket_number = await session.scalar(select(Tickets.number))
-
-        # Если нет билетов в базе, устанавливаем номер 1
-        t_number = max_ticket_number + 1 if max_ticket_number else 1
-
-        new_ticket = Tickets(
-            number=t_number
-        )
+        new_ticket = Tickets()
 
         session.add(new_ticket)
         await session.commit()

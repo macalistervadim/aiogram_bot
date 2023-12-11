@@ -39,7 +39,6 @@ class Tickets(Base):
     __tablename__ = 'tickets'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    number: Mapped[int] = mapped_column()
 
 
 async def async_main():

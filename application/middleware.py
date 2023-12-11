@@ -1,33 +1,43 @@
 import logging
-
+from datetime import datetime, time
 from aiogram import BaseMiddleware
 from typing import Any, Callable, Dict, Awaitable
+from aiogram.types import Message, TelegramObject
 
-from aiogram.dispatcher.event.bases import CancelHandler
-from aiogram.types import Message, CallbackQuery
-from aiogram.types import TelegramObject
-from aiogram.types import Message
-
-from application.database.models import async_session
-from application.database.requests import get_user
 from application.states import Support
 
-class SupportWait(BaseMiddleware):
-    # Мидлварь ожидания техподдержки
+# class SupportWait(BaseMiddleware):
+#     # Мидлварь ожидания техподдержки
+#     async def __call__(
+#             self,
+#             handler: Callable[[Message, Dict[str, Any]], Awaitable[Any]],
+#             event: Message,
+#             data: Dict[str, Any]
+#     ) -> Any:
+#         state = data.get('state')
+#
+#         logging.info(state)
+#
+#         if state == Support.wait:
+#             await event.answer('Вы в режиме ожидания!')
+#         else:
+#             return await handler(event, data)
+
+class CheckTime(BaseMiddleware):
+    #Проверка часов работы бота
     async def __call__(
-            self,
-            handler: Callable[[TelegramObject, Dict[str, Any]], Awaitable[Any]],
-            event: TelegramObject,
-            data: Dict[str, Any],
+        self,
+        handler: Callable[[Message, Dict[str, Any]], Awaitable[Any]],
+        event: Message,
+        data: Dict[str, Any]
     ) -> Any:
-        state = data.get('state')
 
-        logging.info(f'State: {state}')
+        start_time = time(10, 0)
+        end_time = time(19, 0)
 
-        if state == Support.wait:
-            await event.answer('Вы в режиме ожидания!')
-        else:
+        if start_time <= datetime.now().time() <= end_time:
             return await handler(event, data)
-
-
+        return event.answer('Упс!\n\n'
+                            'К сожалению, время работы нашего бота вышло.\n'
+                            'Время работы бота: с 10:00 до 18:00')
 

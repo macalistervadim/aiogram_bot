@@ -8,11 +8,9 @@ import application.keyboards as kb
 import application.states as st
 from application.database.requests import add_user, add_ticket
 from application.database.models import async_session
-from application.middleware import SupportWait
+
 
 router = Router()
-
-router.message.middleware(SupportWait())
 
 @router.message(CommandStart())
 async def cmd_start(message: Message):
