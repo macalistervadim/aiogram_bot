@@ -4,7 +4,7 @@ import asyncio
 
 from aiogram import Bot, Dispatcher
 
-from application.middleware import CheckTime
+from application.middleware import CheckTime, SupportWait
 from application.handlers import router
 from application.database.models import async_main
 from config import TOKEN
@@ -15,7 +15,7 @@ async def main():
     bot = Bot(token=TOKEN)
     dp = Dispatcher()
 
-    #dp.message.middleware(SupportWait())
+    dp.message.middleware(SupportWait())
     dp.message.middleware(CheckTime())
 
 

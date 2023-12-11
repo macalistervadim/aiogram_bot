@@ -42,9 +42,9 @@ async def support(message: Message, state: FSMContext):
                          'Пожалуйста, для продолжения, напишите свой вопрос (для отмены - /cancel): ',
                                                                                             reply_markup=kb.cancel)
 
-    await state.set_state(st.Support.question)
+    await state.set_state(st.Support.wait)
 
-@router.message(st.Support.question)
+@router.message(st.Support.wait)
 async def question(message: Message, state: FSMContext):
     await add_ticket()
 
@@ -56,6 +56,5 @@ async def question(message: Message, state: FSMContext):
                          'Если Вы создали ошибочный тикет, пожалуйста, отмените его командой - /cancel',
                                                                          reply_markup=kb.cancel)
 
-    await state.set_state(st.Support.wait)
 
 
