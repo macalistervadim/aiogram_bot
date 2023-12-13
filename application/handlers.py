@@ -1,9 +1,8 @@
-from aiogram import Router, F
+from aiogram import Router, F, Bot as bot
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
 from aiogram.filters import CommandStart, StateFilter
 from sqlalchemy.ext.asyncio import AsyncSession
-
 import application.keyboards as kb
 import application.states as st
 from application.database.requests import add_user, add_ticket
@@ -41,20 +40,24 @@ async def support(message: Message, state: FSMContext):
                          'Здесь Вы можете найти ответы на интересующие Вас вопросы.\n\n'
                          'Пожалуйста, для продолжения, напишите свой вопрос (для отмены - /cancel): ',
                                                                                             reply_markup=kb.cancel)
+    await state.set_state(st.Support.question)
 
-    await state.set_state(st.Support.wait)
-
-@router.message(st.Support.wait)
+@router.message(st.Support.question)
 async def question(message: Message, state: FSMContext):
-    await add_ticket()
-
     await state.update_data(question=message.text.lower())
+
+    ticket = await add_ticket()
+
+
+    await bot.forward_message(message.chat.id, 5046166133, message.id)
     await message.answer('Спасибо! Мы уже приняли Ваш вопрос и работаем над ним.\n\n'
                          'В данный момент вы были переброшены в режим "Ожидания" - '
                          'в данном режиме недоступны никакие команды. После того, как Ваш вопрос будет решён - '
-                         'Вас автоматически уберет из режима ожидания наш бот. Спасибо за понимание.\n\n'
+                         'Вас автоматически уберет из режима ожидания наш бот. Спасибо за понимание.\n'
+                         f'Вы в очереди - {ticket}\n\n'
                          'Если Вы создали ошибочный тикет, пожалуйста, отмените его командой - /cancel',
                                                                          reply_markup=kb.cancel)
+    await state.set_state(st.Support.wait)
 
 
 

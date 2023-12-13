@@ -19,10 +19,10 @@ class SupportWait(BaseMiddleware):
         state: FSMContext = data.get("state")
         current_state = await state.get_state()
 
-        logging.info(current_state)
-
         if current_state == Support.wait:
-            await event.answer('Вы в режиме ожидания!')
+            await event.answer('Упс.\n\n'
+                               'Кажется Вы находитесь в режиме "ожидания".\n'
+                               'Пожалуйста, ожидайте ответа на свой вопрос, чтобы выйти из режима ожидания')
         else:
             return await handler(event, data)
 

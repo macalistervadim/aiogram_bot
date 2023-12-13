@@ -19,6 +19,8 @@ async def get_user(tg_id):
         if len(result) > 0:
             return True
 
+
+
 async def add_user(session: AsyncSession,tg_id):
     try:
         new_user = User(
@@ -33,6 +35,7 @@ async def add_user(session: AsyncSession,tg_id):
 async def add_ticket():
     async with async_session() as session:
         new_ticket = Tickets()
-
         session.add(new_ticket)
         await session.commit()
+        await session.refresh(new_ticket)  # Обновляем состояние объекта, чтобы получить его ID
+        return new_ticket.id
