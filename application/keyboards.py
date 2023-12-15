@@ -1,4 +1,4 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 
 
@@ -13,6 +13,14 @@ main = ReplyKeyboardMarkup(keyboard=[
     [KeyboardButton(text='Контакты')],
     [KeyboardButton(text='Тех. поддержка')]
 ], resize_keyboard=True, input_field_placeholder='Выберите пункт ниже')
+
+def ticket_inline_keyboard():
+    ticket = InlineKeyboardBuilder()
+    ticket.button(text='Закрыть', callback_data='close_ticket')
+    ticket.button(text='Ответить', callback_data='answer_ticket')
+
+    ticket.adjust(2)
+    return ticket.as_markup()
 
 async def categories():
     categories_kb = InlineKeyboardBuilder()

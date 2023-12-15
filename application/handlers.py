@@ -1,4 +1,4 @@
-from aiogram import Router, F, Bot as bot
+from aiogram import Router, F, Bot
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
 from aiogram.filters import CommandStart, StateFilter
@@ -43,13 +43,14 @@ async def support(message: Message, state: FSMContext):
     await state.set_state(st.Support.question)
 
 @router.message(st.Support.question)
-async def question(message: Message, state: FSMContext):
+async def question(message: Message, state: FSMContext, bot: Bot):
     await state.update_data(question=message.text.lower())
 
     ticket = await add_ticket()
 
+    await bot.send_message('5046166133', f'Пришел новый тикет от @{message.from_user.username}'
+                                         f' №{ticket}\n\n' + message.text, reply_markup=kb.ticket_inline_keyboard())
 
-    await bot.forward_message(message.chat.id, 5046166133, message.id)
     await message.answer('Спасибо! Мы уже приняли Ваш вопрос и работаем над ним.\n\n'
                          'В данный момент вы были переброшены в режим "Ожидания" - '
                          'в данном режиме недоступны никакие команды. После того, как Ваш вопрос будет решён - '
@@ -58,6 +59,5 @@ async def question(message: Message, state: FSMContext):
                          'Если Вы создали ошибочный тикет, пожалуйста, отмените его командой - /cancel',
                                                                          reply_markup=kb.cancel)
     await state.set_state(st.Support.wait)
-
 
 
