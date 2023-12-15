@@ -5,7 +5,7 @@ from aiogram.filters import CommandStart, StateFilter
 from sqlalchemy.ext.asyncio import AsyncSession
 import application.keyboards as kb
 import application.states as st
-from application.database.requests import add_user, add_ticket
+from application.database.requests import add_user, add_ticket, get_ticket, close_ticket_in_database
 from application.database.models import async_session
 
 
@@ -46,7 +46,7 @@ async def support(message: Message, state: FSMContext):
 async def question(message: Message, state: FSMContext, bot: Bot):
     await state.update_data(question=message.text.lower())
 
-    ticket = await add_ticket()
+    ticket = await add_ticket(tg_id=message.from_user.id)
 
     await bot.send_message('5046166133', f'Пришел новый тикет от @{message.from_user.username}'
                                          f' №{ticket}\n\n' + message.text, reply_markup=kb.ticket_inline_keyboard())
@@ -60,4 +60,30 @@ async def question(message: Message, state: FSMContext, bot: Bot):
                                                                          reply_markup=kb.cancel)
     await state.set_state(st.Support.wait)
 
+@router.callback_query(F.data.startswith('answer_'))
+async def answer_ticket_1(callback: CallbackQuery, state: FSMContext):
+    await callback.message.answer('Введите номер тикета, на который хотите ответить:')
 
+    await state.set_state(st.AnswerQuestion.ticket_number)
+
+@router.message(st.AnswerQuestion.ticket_number)
+async def answer_ticket_2(message: Message, state: FSMContext):
+    await state.update_data(ticket_number=message.text.lower())
+
+    await message.answer('Введите ответ на тикет: ')
+
+    await state.set_state(st.AnswerQuestion.answer)
+
+@router.message(st.AnswerQuestion.answer)
+async def answer_ticket_3(message: Message, state: FSMContext, bot: Bot):
+    await state.update_data(answer=message.text.lower())
+
+    data = await state.get_data()
+    ticket_id = data.get('ticket_number')
+    tg_id = await get_ticket(ticket_id)
+    await close_ticket_in_database(ticket_id)
+    if tg_id:
+        await bot.send_message(tg_id, data.get('answer'))
+    await message.answer('Ваш ответ успешно отправлен пользователю')
+
+    await state.clear()

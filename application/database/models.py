@@ -39,7 +39,7 @@ class Tickets(Base):
     __tablename__ = 'tickets'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-
+    tg_id: Mapped[int] = mapped_column(unique=True)
 
 async def async_main():
     async with engine.begin() as conn:
