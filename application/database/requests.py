@@ -24,6 +24,11 @@ async def get_ticket(id):
         result = await session.scalar(select(Tickets.tg_id).where(Tickets.id == id))
         return result
 
+async def get_ticket_user(user_id):
+    async with async_session() as session:
+        result = await session.scalar(select(Tickets.tg_id).where(Tickets.tg_id == user_id))
+        return result
+
 async def close_ticket_in_database(ticket_id):
     async with async_session() as session:
         try:
