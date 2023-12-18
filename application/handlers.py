@@ -10,6 +10,11 @@ from application.database.models import async_session
 
 router = Router()
 
+@router.message(F.text == '/cancel')
+async def cancel(message: Message, state: FSMContext):
+    await state.clear()
+    await message.answer('Ваш текущий запрос был отменен.')
+
 @router.message(CommandStart())
 async def cmd_start(message: Message):
     async with async_session() as session:
