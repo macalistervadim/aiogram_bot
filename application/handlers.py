@@ -4,7 +4,8 @@ from aiogram.types import Message, CallbackQuery
 from aiogram.filters import CommandStart, StateFilter
 import application.keyboards as kb
 import application.states as st
-from application.database.requests import add_user, add_ticket, get_ticket, close_ticket_in_database
+from application.database.requests import (add_user, add_ticket, get_ticket, close_ticket_in_database,
+                                           get_course)
 from application.database.models import async_session
 
 
@@ -22,21 +23,23 @@ async def cmd_start(message: Message):
 
     await message.answer(f'Привет, {message.from_user.full_name}\n', reply_markup=kb.main)
 
-@router.message(F.text == 'Каталог')
+@router.message(F.text == 'Наши курсы')
 async def catalog(message: Message):
     await message.answer('Выберите вариант из каталога', reply_markup=await kb.categories())
 
 @router.callback_query(F.data.startswith('category_'))
-async def category_selected(callback: CallbackQuery):
-    category_id = callback.data.split('_')[1]
-    await callback.message.answer(f'Товары по выбранной категории: ', reply_markup=await kb.products(category_id))
-    await callback.answer('')
+async def answer_ticket_1(callback: CallbackQuery):
+    category_id = callback.data.split('_')[1]  # Получаем идентификатор категории
+    courses = await get_course(category_id)
+    if courses:
+        for course in courses:
+            await callback.message.answer('Отличный выбор, вот описание курса:\n\n'
+                                          f'Название: {course.name}\n'
+                                          f'Преподаватель: {course.teacher}\n'
+                                          f'Длительность: {course.duration}\n'
+                                          f'Описание {course.description}\n\n'
+                                          f'Цена: {course.price}\n')
 
-@router.callback_query(F.data.startswith('product_'))
-async def product_selected(callback: CallbackQuery):
-    product_id = callback.data.split('_')[1]
-    await callback.message.answer(f'Ваш товар {product_id}')
-    await callback.answer('')
 
 @router.message(StateFilter(None), F.text == 'Тех. поддержка')
 async def support(message: Message, state: FSMContext):

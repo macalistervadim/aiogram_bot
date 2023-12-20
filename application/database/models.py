@@ -21,19 +21,10 @@ class Category(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column()
-
-    products = relationship('Product', back_populates='category')
-
-class Product(Base):
-    __tablename__ = 'products'
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column()
+    teacher: Mapped[str] = mapped_column()
+    duration: Mapped[int] = mapped_column()
     description: Mapped[str] = mapped_column()
     price: Mapped[int] = mapped_column()
-    category_id: Mapped[int] = mapped_column(ForeignKey('categories.id'))
-
-    category = relationship('Category', back_populates='products')
 
 class Tickets(Base):
     __tablename__ = 'tickets'

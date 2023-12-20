@@ -1,17 +1,17 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from application.database.models import User, Category, Product, async_session, Tickets
+from application.database.models import User, Category, async_session, Tickets
 from sqlalchemy import select, delete
 
 async def get_categories():
     async with async_session() as session:
-        result = await session.scalars(select(Category))
-        return result
+        result = await session.execute(select(Category))
+        return result.scalars().all()
 
-async def get_products(category_id):
+async def get_course(name):
     async with async_session() as session:
-        result = await session.scalars(select(Product).where(Product.category_id == category_id))
-        return result
+        result = await session.execute(select(Category).where(Category.id == name))
+        return result.scalars().all()
 
 async def get_user(tg_id):
     async with async_session() as session:
