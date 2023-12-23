@@ -5,16 +5,21 @@ from aiogram.filters import CommandStart, StateFilter
 import application.keyboards as kb
 import application.states as st
 from application.database.requests import (add_user, add_ticket, get_ticket, close_ticket_in_database,
-                                           get_course)
+                                           get_course, get_ticket_id)
 from application.database.models import async_session
 
+# ДОДЕЛАТЬ ИНЛАЙН КНОПКУ ЗАКРЫТЬ В ТИКЕТАХ!!!!!!!!!!!!!!!!!!!!!
 
 router = Router()
 
 @router.message(F.text == '/cancel')
 async def cancel(message: Message, state: FSMContext):
+    ticket_user = await get_ticket_id(message.from_user.id)
+
     await state.clear()
     await message.answer('Ваш текущий запрос был отменен.')
+    if ticket_user:
+        await close_ticket_in_database(ticket_user)
 
 @router.message(CommandStart())
 async def cmd_start(message: Message):
@@ -22,6 +27,15 @@ async def cmd_start(message: Message):
         await add_user(session, tg_id=message.from_user.id)
 
     await message.answer(f'Привет, {message.from_user.full_name}\n', reply_markup=kb.main)
+
+@router.message(F.text == 'Контакты')
+async def catalog(message: Message):
+    await message.answer('Контакты нашей онлайн-школы:\n\n'
+                         'Номер телефона: +7 900 00 000\n'
+                         'Email: online@hotmail.com\n'
+                         'Сайт: online-school.com\n\n'
+                         'Если остались какие-либо вопросы - наша Техническая поддержка всегда готова Вам помочь.',
+                         reply_markup=kb.main)
 
 @router.message(F.text == 'Наши курсы')
 async def catalog(message: Message):
@@ -38,7 +52,7 @@ async def answer_ticket_1(callback: CallbackQuery):
                                           f'Преподаватель: {course.teacher}\n'
                                           f'Длительность: {course.duration}\n'
                                           f'Описание {course.description}\n\n'
-                                          f'Цена: {course.price}\n')
+                                          f'Цена: {course.price} в месяц\n')
 
 
 @router.message(StateFilter(None), F.text == 'Тех. поддержка')
