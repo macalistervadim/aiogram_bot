@@ -8,3 +8,9 @@ class Support(StatesGroup):
 class AnswerQuestion(StatesGroup):
     ticket_number = State()
     answer = State()
+
+class CloseTicket(StatesGroup):
+    ticket_number = State()
+
+class GetConsultation(StatesGroup):
+    number = State()

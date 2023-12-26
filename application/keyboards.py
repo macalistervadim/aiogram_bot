@@ -14,6 +14,8 @@ main = ReplyKeyboardMarkup(keyboard=[
     [KeyboardButton(text='Тех. поддержка')]
 ], resize_keyboard=True, input_field_placeholder='Выберите пункт ниже')
 
+
+
 def ticket_inline_keyboard():
     ticket = InlineKeyboardBuilder()
     ticket.button(text='Закрыть', callback_data='close_ticket')
@@ -21,6 +23,11 @@ def ticket_inline_keyboard():
 
     ticket.adjust(2)
     return ticket.as_markup()
+
+def course_inline_keyboard():
+    course = InlineKeyboardBuilder()
+    course.button(text='Получить консультацию', callback_data='consultation')
+    return course.as_markup()
 
 async def categories():
     categories_kb = InlineKeyboardBuilder()
