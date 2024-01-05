@@ -1,8 +1,9 @@
+import phonenumbers
+
 from aiogram import Router, F, Bot
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
 from aiogram.filters import CommandStart, StateFilter
-import phonenumbers
 
 import application.keyboards as kb
 import application.states as st
