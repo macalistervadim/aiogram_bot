@@ -14,6 +14,7 @@ from application.database.models import async_session
 
 router = Router()
 
+
 @router.message(F.text == '/cancel')
 async def cancel(message: Message, state: FSMContext):
     ticket_user = await get_ticket_id(message.from_user.id)
