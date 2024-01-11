@@ -1,10 +1,13 @@
 from aiogram import Bot
 from aiogram.filters import Command
+from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from aiogram.utils.markdown import hide_link
 
 import config
-from application.database.requests import get_users
+from application.database.requests import get_users, add_pcode
+import application.states as st
+from application.database.models import async_session
 
 async def auto_reklama(bot: Bot):
     users = await get_users()
@@ -34,6 +37,41 @@ async def mailing(message: Message, bot: Bot):
         mailing_t = message.text[9:]
         for i in users:
            await bot.send_message(i, mailing_t, parse_mode='HTML')
+
+async def new_pcode(message: Message, state: FSMContext):
+    if message.from_user.id == int(config.ADMIN_ID):
+        await message.answer('Вы начали процесс создания промокода.\n'
+                             'Пожалуйста, введите название промокода:')
+        await state.set_state(st.AddPcode.pcode)
+
+async def pre_proccess_pcode(message: Message, state: FSMContext, bot: Bot):
+    await state.update_data(pcode=message.text.lower())
+
+    await message.answer('Теперь необходимо ввести срок действия промокода (дату окончания): ')
+    await state.set_state(st.AddPcode.validity)
+
+async def pre_finally_proccess_pcode(message: Message, state: FSMContext, bot: Bot):
+    await state.update_data(validity=message.text.lower())
+
+    await message.answer('Теперь необходимо ввести процент скидки (просто число):')
+    await state.set_state(st.AddPcode.discount)
+
+async def finally_proccess_pcode(message: Message, state: FSMContext, bot: Bot):
+    await state.update_data(discount=message.text.lower())
+    data = await state.get_data()
+    try:
+        async with async_session() as session:
+            await add_pcode(data, session)
+        await message.answer('Вы успешно создали промокод:\n'
+                                 f'Название: {data.get("pcode")}\n'
+                                 f'Дата окончания действия промокода: {data.get("validity")}\n'
+                                 f'Процент скидки: {data.get("discount")}\n')
+        await state.clear()
+    except:
+        await message.answer('Произошла ошибка создания промокода')
+
+
+
 
 
 

@@ -14,3 +14,9 @@ class CloseTicket(StatesGroup):
 
 class GetConsultation(StatesGroup):
     number = State()
+# ВВЕСТИ ПРОМОКОД
+
+class AddPcode(StatesGroup):
+    pcode = State()
+    validity = State()
+    discount = State()

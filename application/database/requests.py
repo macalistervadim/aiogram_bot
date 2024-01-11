@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from application.database.models import User, Category, async_session, Tickets
+from application.database.models import User, Category, async_session, Tickets, Pcodes
 from sqlalchemy import select, delete
 
 async def get_categories():
@@ -39,6 +39,14 @@ async def get_users():
         result = await session.scalars(select(User.tg_id))
         return result
 
+
+async def get_pcode(pcod):
+    async with async_session() as session:
+        result = await session.scalars(select(Pcodes).where(Pcodes.pcode == pcod))
+        return result
+
+
+
 async def close_ticket_in_database(ticket_id):
     async with async_session() as session:
         try:
@@ -55,6 +63,19 @@ async def add_user(session: AsyncSession,tg_id):
         )
 
         session.add(new_user)
+        await session.commit()
+    except Exception:
+        pass
+
+async def add_pcode(data, session: AsyncSession):
+    try:
+        pcod = Pcodes(
+            pcode=data.get('pcode'),
+            validity=data.get('validity'),
+            discount=data.get('discount')
+        )
+
+        session.add(pcod)
         await session.commit()
     except Exception:
         pass

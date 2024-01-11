@@ -32,6 +32,15 @@ class Tickets(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     tg_id: Mapped[int] = mapped_column(unique=True)
 
+class Pcodes(Base):
+    __tablename__ = 'pcodes'
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    pcode: Mapped[str] = mapped_column(unique=True)
+    validity: Mapped[int] = mapped_column()
+    discount: Mapped[int] = mapped_column()
+
+
 async def async_main():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)

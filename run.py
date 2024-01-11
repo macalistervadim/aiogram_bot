@@ -5,15 +5,15 @@ import asyncio
 from aiogram.filters import Command
 from aiogram.types import Message
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-
 from aiogram import Bot, Dispatcher
 
-from application.filters.is_admin import IsAdminFilter
 from application.middleware import CheckTime, SupportWait
 from application.handlers import router
 from application.database.models import async_main
 from config import TOKEN
-from application.admin import auto_reklama, reklama_2, mailing
+from application.admin import auto_reklama, reklama_2, mailing, new_pcode, pre_proccess_pcode, \
+                            pre_finally_proccess_pcode, finally_proccess_pcode
+import application.states as st
 
 # ПРОМОКОДЫ
 
@@ -34,6 +34,10 @@ async def main():
         await mailing(message, bot)
 
     dp.message.register(mailing_handler, Command('mailing'))
+    dp.message.register(new_pcode, Command('add_pcode'))
+    dp.message.register(pre_proccess_pcode, st.AddPcode.pcode)
+    dp.message.register(pre_finally_proccess_pcode, st.AddPcode.validity)
+    dp.message.register(finally_proccess_pcode, st.AddPcode.discount)
 
 
     scheduler.start()
