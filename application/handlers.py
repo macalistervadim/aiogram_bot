@@ -9,7 +9,7 @@ import application.keyboards as kb
 import application.states as st
 import config
 from application.database.requests import (add_user, add_ticket, get_ticket, close_ticket_in_database,
-                                           get_course, get_ticket_id)
+                                           get_course, get_ticket_id, get_pcode)
 from application.database.models import async_session
 
 router = Router()
@@ -132,21 +132,41 @@ async def consultation_1(callback: CallbackQuery, state: FSMContext):
 
 @router.message(st.GetConsultation.number)
 async def get_consultation_number(message: Message, state: FSMContext, bot: Bot):
-    phone_number = message.text
+    await state.update_data(phone=message.text.lower())
+    data = await state.get_data()
     try:
-        parsed_number = phonenumbers.parse(phone_number, None)
+        parsed_number = phonenumbers.parse(data.get('phone'), None)
         if not phonenumbers.is_valid_number(parsed_number):
             raise ValueError("Invalid phone number")
-        await bot.send_message(config.ADMIN_ID, 'Пришел запрос на консультацию по курсу.\n'
-                                                f'Номер телефона: {phone_number}')
-        await message.answer('Ваш запрос на консультацию успешно принят!\n\n'
-                             'В ближайшее время с Вами свяжется наш Агент поддержки и проконсультирует Вас '
-                             'по интересующему вопросу. Пожалуйста, ожидайте')
-        await state.clear()
+        await message.answer('У вас есть специальный промокод? (если нет - введите 0)')
+        await state.set_state(st.GetConsultation.pcode)
     except Exception as e:
         await message.answer('Некорректный номер телефона. Пожалуйста, используйте формат: +X ХХХХХХХХХХ.')
         await state.set_state(st.GetConsultation.number)
         return
+
+@router.message(st.GetConsultation.pcode)
+async def get_consultation_pcode(message: Message, state: FSMContext, bot: Bot):
+    await state.update_data(pcode=message.text.lower())
+    data = await state.get_data()
+
+
+    if message.text.lower() != '0':
+        get_p = await get_pcode(message.text.lower())
+        if get_p is None:
+                await message.answer('Такого промокода не существует, попробуйте заново или введите - 0')
+                await state.set_state(st.GetConsultation.pcode)
+                return
+    await state.update_data(pcode=message.text.lower())
+
+    await bot.send_message(config.ADMIN_ID, 'Пришел запрос на консультацию по курсу.\n'
+                                                        f'Номер телефона: {data.get("phone")}\n'
+                                                        f'Промокод: {data.get("pcode")}')
+
+    await message.answer('Ваш запрос на консультацию успешно принят!\n\n'
+                                     'В ближайшее время с Вами свяжется наш Агент поддержки и проконсультирует Вас '
+                                     'по интересующему вопросу. Пожалуйста, ожидайте')
+    await state.clear()
 
 @router.callback_query(F.data.startswith('close_'))
 async def answer_ticket_1(callback: CallbackQuery, state: FSMContext):

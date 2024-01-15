@@ -42,9 +42,8 @@ async def get_users():
 
 async def get_pcode(pcod):
     async with async_session() as session:
-        result = await session.scalars(select(Pcodes).where(Pcodes.pcode == pcod))
+        result = await session.scalar(select(Pcodes).where(Pcodes.pcode == pcod))
         return result
-
 
 
 async def close_ticket_in_database(ticket_id):
