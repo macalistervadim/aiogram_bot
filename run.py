@@ -36,7 +36,7 @@ async def main():
     dp.message.register(mailing_handler, Command('mailing'))
     dp.message.register(new_pcode, Command('add_pcode'))
     dp.message.register(pre_proccess_pcode, st.AddPcode.pcode)
-    dp.message.register(pre_finally_proccess_pcode, st.AddPcode.validity)
+    dp.message.register(pre_finally_proccess_pcode, st.AddPcode.count)
     dp.message.register(finally_proccess_pcode, st.AddPcode.discount)
 
 

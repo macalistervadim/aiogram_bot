@@ -40,11 +40,39 @@ async def get_users():
         return result
 
 
-async def get_pcode(pcod):
-    async with async_session() as session:
-        result = await session.scalar(select(Pcodes).where(Pcodes.pcode == pcod))
-        return result
+async def decrease_activation_count(session, pcode_id):
+    try:
+        pcode = await session.get(Pcodes, pcode_id)
 
+        pcode.count -= 1
+
+        await session.commit()
+
+    except Exception as e:
+        print(f"An error occurred while decreasing activation count: {e}")
+
+async def activation_pcode(pcode):
+    async with async_session() as session:
+        session, pcode_obj = await get_pcode(session, pcode)
+
+        if pcode_obj:
+            if pcode_obj.count > 0:
+                await decrease_activation_count(session, pcode_obj.id)
+
+                return True, pcode_obj
+            else:
+                return False, None
+        else:
+            return False, None
+
+async def get_pcode(session, pcod):
+    result = await session.execute(select(Pcodes).where(Pcodes.pcode == pcod))
+    pcode = result.scalar()
+
+    if pcode:
+        return session, pcode
+    else:
+        return session, None
 
 async def close_ticket_in_database(ticket_id):
     async with async_session() as session:
@@ -70,7 +98,7 @@ async def add_pcode(data, session: AsyncSession):
     try:
         pcod = Pcodes(
             pcode=data.get('pcode'),
-            validity=data.get('validity'),
+            count=data.get('validity'),
             discount=data.get('discount')
         )
 
@@ -87,7 +115,7 @@ async def add_ticket(tg_id):
             )
             session.add(new_ticket)
             await session.commit()
-            await session.refresh(new_ticket)  # Обновляем состояние объекта, чтобы получить его ID
+            await session.refresh(new_ticket)
             return new_ticket.id
         except Exception:
             return False

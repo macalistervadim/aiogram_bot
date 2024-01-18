@@ -1,5 +1,5 @@
-from sqlalchemy import BigInteger, ForeignKey, Column, VARCHAR
-from sqlalchemy.orm import relationship, Mapped, mapped_column, DeclarativeBase
+from sqlalchemy import BigInteger
+from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase
 from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_engine
 
 from config import SQLACLHEMY_URL
@@ -37,7 +37,7 @@ class Pcodes(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     pcode: Mapped[str] = mapped_column(unique=True)
-    validity: Mapped[int] = mapped_column()
+    count: Mapped[int] = mapped_column()
     discount: Mapped[int] = mapped_column()
 
 

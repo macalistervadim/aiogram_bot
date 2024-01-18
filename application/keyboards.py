@@ -1,5 +1,5 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup
-from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 
 from application.database.requests import get_categories
@@ -9,9 +9,9 @@ cancel = ReplyKeyboardMarkup(keyboard=[
 ], resize_keyboard=True, input_field_placeholder='Для отмены нажмите /cancel')
 
 main = ReplyKeyboardMarkup(keyboard=[
-    [KeyboardButton(text='Наши курсы')],
-    [KeyboardButton(text='Контакты')],
-    [KeyboardButton(text='Тех. поддержка')]
+    [KeyboardButton(text='📚 Наши курсы')],
+    [KeyboardButton(text='📪 Контакты')],
+    [KeyboardButton(text='📨 Тех. поддержка')]
 ], resize_keyboard=True, input_field_placeholder='Выберите пункт ниже')
 
 

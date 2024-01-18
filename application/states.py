@@ -18,5 +18,5 @@ class GetConsultation(StatesGroup):
 
 class AddPcode(StatesGroup):
     pcode = State()
-    validity = State()
+    count = State()
     discount = State()

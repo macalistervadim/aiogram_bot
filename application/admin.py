@@ -1,5 +1,4 @@
 from aiogram import Bot
-from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from aiogram.utils.markdown import hide_link
@@ -47,8 +46,8 @@ async def new_pcode(message: Message, state: FSMContext):
 async def pre_proccess_pcode(message: Message, state: FSMContext, bot: Bot):
     await state.update_data(pcode=message.text.lower())
 
-    await message.answer('Теперь необходимо ввести срок действия промокода (дату окончания): ')
-    await state.set_state(st.AddPcode.validity)
+    await message.answer('Теперь необходимо ввести кол-во активаций: ')
+    await state.set_state(st.AddPcode.count)
 
 async def pre_finally_proccess_pcode(message: Message, state: FSMContext, bot: Bot):
     await state.update_data(validity=message.text.lower())
@@ -64,7 +63,7 @@ async def finally_proccess_pcode(message: Message, state: FSMContext, bot: Bot):
             await add_pcode(data, session)
         await message.answer('Вы успешно создали промокод:\n'
                                  f'Название: {data.get("pcode")}\n'
-                                 f'Дата окончания действия промокода: {data.get("validity")}\n'
+                                 f'Количество активаций: {data.get("validity")}\n'
                                  f'Процент скидки: {data.get("discount")}\n')
         await state.clear()
     except:

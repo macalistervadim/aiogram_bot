@@ -1,10 +1,8 @@
-import logging
 from datetime import datetime, time
 from aiogram import BaseMiddleware
 from typing import Any, Callable, Dict, Awaitable
 from aiogram.types import Message
 
-from application.states import Support
 from application.database.requests import get_ticket_user
 
 class SupportWait(BaseMiddleware):
